@@ -117,7 +117,7 @@ const editRepresentative = async (
   rp_contacto
 ) => {
   try {
-    const query = "SELECT functeditolderadult($1, $2, $3, $4, $5, $6, $7)";
+    const query = "SELECT functeditrepresentative($1, $2, $3, $4, $5, $6, $7)";
     const { rows } = await pool.query(query, [
       rp_idusuario,
       rp_idcard,
@@ -143,7 +143,7 @@ const editOlderAdult = async (
   oa_enfermedad
 ) => {
   try {
-    const query = "SELECT functeditrepresentative($1, $2, $3, $4, $5, $6, $7)";
+    const query = "SELECT functeditolderadult($1, $2, $3, $4, $5, $6, $7)";
     const { rows } = await pool.query(query, [
       oa_idusuario,
       oa_idcard,
