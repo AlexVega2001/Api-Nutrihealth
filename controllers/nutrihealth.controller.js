@@ -12,8 +12,10 @@ const GetListOlderController = async (req, res) => {
 
 const GetAllRepOlderController = async (req, res) => {
   try {
-    const { email } = req.body;
-    const data = await nutrihealthModel.FindAllRepOlderByEmail(email);
+    const { identificacion } = req.body;
+    const data = await nutrihealthModel.FindAllRepOlderByIdentification(
+      identificacion
+    );
     res.json(data);
   } catch (error) {
     console.log(error);
@@ -24,40 +26,9 @@ const GetAllRepOlderController = async (req, res) => {
 // Validate Login
 const ValidateLoginController = async (req, res) => {
   try {
-    const { vl_email, vl_password } = req.body;
-    const data = await nutrihealthModel.FindLogin(vl_email, vl_password);
-    if (data) {
-      res.json({
-        data,
-        status: "success",
-        message: "Login exitoso!",
-      });
-    } else {
-      res.json({
-        status: "error",
-        message: "Login fallido!",
-      });
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-const ValidateEmailController = async (req, res) => {
-  try {
-    const { email } = req.body;
-    const data = await nutrihealthModel.IsValidEmail(email);
-    if (!data) {
-      res.json({
-        status: "success",
-        message: "Email no existente!",
-      });
-    } else {
-      res.json({
-        status: "error",
-        message: "Email existente!",
-      });
-    }
+    const { vl_idcard, vl_password } = req.body;
+    const data = await nutrihealthModel.FindLogin(vl_idcard, vl_password);
+    return res.json(data);
   } catch (error) {
     console.log(error);
   }
@@ -85,8 +56,8 @@ const ValidateIdCardAdultController = async (req, res) => {
 
 const ChangePasswordController = async (req, res) => {
   try {
-    const { ch_email, ch_password } = req.body;
-    await nutrihealthModel.ChangePassword(ch_email, ch_password);
+    const { ch_identificacion, ch_password } = req.body;
+    await nutrihealthModel.ChangePassword(ch_identificacion, ch_password);
     res.json({
       status: "success",
       message: "Se cambió correctamente la contraseña!",
@@ -244,7 +215,6 @@ export const nutrihealthController = {
   GetListOlderController,
   GetAllRepOlderController,
   ValidateLoginController,
-  ValidateEmailController,
   ValidateIdCardAdultController,
   ChangePasswordController,
   RegisterAdminController,

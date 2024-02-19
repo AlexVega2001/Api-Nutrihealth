@@ -10,10 +10,10 @@ const ListOlderAdults = async () => {
   }
 };
 
-const FindAllRepOlderByEmail = async (email) => {
+const FindAllRepOlderByIdentification = async (identificacion) => {
   try {
     const query = "SELECT listallrepresentativeolderadult($1)";
-    const { rows } = await pool.query(query, [email]);
+    const { rows } = await pool.query(query, [identificacion]);
     return rows[0].listallrepresentativeolderadult;
   } catch (error) {
     console.log("Error en la consulta a la BD: " + error);
@@ -21,21 +21,11 @@ const FindAllRepOlderByEmail = async (email) => {
 };
 
 // QUERY VALIDATE LOGIN
-const FindLogin = async (email, password) => {
+const FindLogin = async (idcard, password) => {
   try {
     const query = "SELECT loginvalidate($1, $2)";
-    const { rows } = await pool.query(query, [email, password]);
+    const { rows } = await pool.query(query, [idcard, password]);
     return rows[0].loginvalidate;
-  } catch (error) {
-    console.log("Error en la consulta a la BD: " + error);
-  }
-};
-
-const IsValidEmail = async (email) => {
-  try {
-    const query = "SELECT isexistemail($1)";
-    const { rows } = await pool.query(query, [email]);
-    return rows[0].isexistemail;
   } catch (error) {
     console.log("Error en la consulta a la BD: " + error);
   }
@@ -51,10 +41,10 @@ const IsValidIdCardAdult = async (idCard) => {
   }
 };
 
-const ChangePassword = async (email, newPassword) => {
+const ChangePassword = async (identificacion, newPassword) => {
   try {
     const query = "CALL changepasswordcredential($1, $2)";
-    const { rows } = await pool.query(query, [email, newPassword]);
+    const { rows } = await pool.query(query, [identificacion, newPassword]);
     return rows;
   } catch (error) {
     console.log("Error en la consulta a la BD: " + error);
@@ -98,13 +88,10 @@ const RegisterOlderAdult = async (
   oa_lastnames,
   oa_gender,
   oa_birthdate,
-  oa_enfermedad,
-  cr_correo,
-  cr_password
+  oa_enfermedad
 ) => {
   try {
-    const query =
-      "SELECT functaddolderadult($1, $2, $3, $4, $5, $6, $7, $8, $9)";
+    const query = "SELECT functaddolderadult($1, $2, $3, $4, $5, $6, $7)";
     const { rows } = await pool.query(query, [
       rp_idcard,
       oa_idcard,
@@ -113,8 +100,6 @@ const RegisterOlderAdult = async (
       oa_gender,
       oa_birthdate,
       oa_enfermedad,
-      cr_correo,
-      cr_password,
     ]);
     return rows[0].functaddolderadult;
   } catch (error) {
@@ -201,9 +186,8 @@ const EditOlderAdult = async (
 
 export const nutrihealthModel = {
   ListOlderAdults,
-  FindAllRepOlderByEmail,
+  FindAllRepOlderByIdentification,
   FindLogin,
-  IsValidEmail,
   IsValidIdCardAdult,
   ChangePassword,
   RegisterAdministrator,

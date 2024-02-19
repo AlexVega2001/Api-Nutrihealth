@@ -9,7 +9,6 @@ router.get("/getAllOlder", nutrihealthController.GetListOlderController);
 // METHODS POST
 router.post("/getAllRepOlder", nutrihealthController.GetAllRepOlderController);
 router.post("/validate-login", nutrihealthController.ValidateLoginController);
-router.post("/validate-email", nutrihealthController.ValidateEmailController);
 router.post(
   "/validate-idCardAdult",
   nutrihealthController.ValidateIdCardAdultController
