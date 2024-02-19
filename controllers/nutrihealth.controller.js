@@ -1,9 +1,19 @@
 import { nutrihealthModel } from "../models/nutrihealth.model.js";
 
-const getAllRepOlderController = async (req, res) => {
+const GetListOlderController = async (req, res) => {
+  try {
+    const data = await nutrihealthModel.ListOlderAdults();
+    res.json(data);
+  } catch (error) {
+    console.log(error);
+    res.json(error);
+  }
+};
+
+const GetAllRepOlderController = async (req, res) => {
   try {
     const { email } = req.body;
-    const data = await nutrihealthModel.findAllRepOlderByEmail(email);
+    const data = await nutrihealthModel.FindAllRepOlderByEmail(email);
     res.json(data);
   } catch (error) {
     console.log(error);
@@ -12,10 +22,10 @@ const getAllRepOlderController = async (req, res) => {
 };
 
 // Validate Login
-const validateLogin = async (req, res) => {
+const ValidateLoginController = async (req, res) => {
   try {
     const { vl_email, vl_password } = req.body;
-    const data = await nutrihealthModel.findLogin(vl_email, vl_password);
+    const data = await nutrihealthModel.FindLogin(vl_email, vl_password);
     if (data) {
       res.json({
         data,
@@ -33,8 +43,61 @@ const validateLogin = async (req, res) => {
   }
 };
 
+const ValidateEmailController = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const data = await nutrihealthModel.IsValidEmail(email);
+    if (!data) {
+      res.json({
+        status: "success",
+        message: "Email no existente!",
+      });
+    } else {
+      res.json({
+        status: "error",
+        message: "Email existente!",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const ValidateIdCardAdultController = async (req, res) => {
+  try {
+    const { idCardAdult } = req.body;
+    const data = await nutrihealthModel.IsValidIdCardAdult(idCardAdult);
+    if (!data) {
+      res.json({
+        status: "success",
+        message: "Cédula no existente!",
+      });
+    } else {
+      res.json({
+        status: "error",
+        message: "Cédula existente!",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const ChangePasswordController = async (req, res) => {
+  try {
+    const { ch_email, ch_password } = req.body;
+    await nutrihealthModel.ChangePassword(ch_email, ch_password);
+    res.json({
+      status: "success",
+      message: "Se cambió correctamente la contraseña!",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //REGISTER DATA
-const registerAdminController = async (req, res) => {
+const RegisterAdminController = async (req, res) => {
   try {
     const {
       ad_idcard,
@@ -46,7 +109,7 @@ const registerAdminController = async (req, res) => {
       ad_email,
       ad_password,
     } = req.body;
-    const response = await nutrihealthModel.registerAdmin(
+    const response = await nutrihealthModel.RegisterAdmin(
       ad_idcard,
       ad_names,
       ad_lastnames,
@@ -63,7 +126,7 @@ const registerAdminController = async (req, res) => {
   }
 };
 
-const registerOlderAdultController = async (req, res) => {
+const RegisterOlderAdultController = async (req, res) => {
   try {
     const {
       rp_idcard,
@@ -76,7 +139,7 @@ const registerOlderAdultController = async (req, res) => {
       cr_correo,
       cr_password,
     } = req.body;
-    const response = await nutrihealthModel.registerOlderAdult(
+    const response = await nutrihealthModel.RegisterOlderAdult(
       rp_idcard,
       oa_idcard,
       oa_names,
@@ -94,7 +157,7 @@ const registerOlderAdultController = async (req, res) => {
   }
 };
 
-const registerRepresentativeController = async (req, res) => {
+const RegisterRepresentativeController = async (req, res) => {
   try {
     const {
       rp_idcard,
@@ -105,7 +168,7 @@ const registerRepresentativeController = async (req, res) => {
       rp_contacto,
     } = req.body;
 
-    const response = await nutrihealthModel.registerRepresentative(
+    const response = await nutrihealthModel.RegisterRepresentative(
       rp_idcard,
       rp_names,
       rp_lastnames,
@@ -121,7 +184,7 @@ const registerRepresentativeController = async (req, res) => {
 };
 
 // EDIT DATA
-const editRepresentativeController = async (req, res) => {
+const EditRepresentativeController = async (req, res) => {
   try {
     const {
       rp_idusuario,
@@ -133,7 +196,7 @@ const editRepresentativeController = async (req, res) => {
       rp_contacto,
     } = req.body;
 
-    const response = await nutrihealthModel.editRepresentative(
+    const response = await nutrihealthModel.EditRepresentative(
       rp_idusuario,
       rp_idcard,
       rp_names,
@@ -149,7 +212,7 @@ const editRepresentativeController = async (req, res) => {
   }
 };
 
-const editOlderAdultController = async (req, res) => {
+const EditOlderAdultController = async (req, res) => {
   try {
     const {
       oa_idusuario,
@@ -161,7 +224,7 @@ const editOlderAdultController = async (req, res) => {
       oa_enfermedad,
     } = req.body;
 
-    const response = await nutrihealthModel.editOlderAdult(
+    const response = await nutrihealthModel.EditOlderAdult(
       oa_idusuario,
       oa_idcard,
       oa_names,
@@ -178,11 +241,15 @@ const editOlderAdultController = async (req, res) => {
 };
 
 export const nutrihealthController = {
-  getAllRepOlderController,
-  validateLogin,
-  registerAdminController,
-  registerOlderAdultController,
-  registerRepresentativeController,
-  editRepresentativeController,
-  editOlderAdultController,
+  GetListOlderController,
+  GetAllRepOlderController,
+  ValidateLoginController,
+  ValidateEmailController,
+  ValidateIdCardAdultController,
+  ChangePasswordController,
+  RegisterAdminController,
+  RegisterOlderAdultController,
+  RegisterRepresentativeController,
+  EditRepresentativeController,
+  EditOlderAdultController,
 };

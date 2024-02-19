@@ -1,6 +1,16 @@
 import { pool } from "../database/connection.js";
 
-const findAllRepOlderByEmail = async (email) => {
+const ListOlderAdults = async () => {
+  try {
+    const query = "SELECT listolderadults()";
+    const { rows } = await pool.query(query);
+    return rows[0].listolderadults;
+  } catch (error) {
+    console.log("Error en la consulta a la BD: " + error);
+  }
+};
+
+const FindAllRepOlderByEmail = async (email) => {
   try {
     const query = "SELECT listallrepresentativeolderadult($1)";
     const { rows } = await pool.query(query, [email]);
@@ -11,7 +21,7 @@ const findAllRepOlderByEmail = async (email) => {
 };
 
 // QUERY VALIDATE LOGIN
-const findLogin = async (email, password) => {
+const FindLogin = async (email, password) => {
   try {
     const query = "SELECT loginvalidate($1, $2)";
     const { rows } = await pool.query(query, [email, password]);
@@ -21,8 +31,38 @@ const findLogin = async (email, password) => {
   }
 };
 
+const IsValidEmail = async (email) => {
+  try {
+    const query = "SELECT isexistemail($1)";
+    const { rows } = await pool.query(query, [email]);
+    return rows[0].isexistemail;
+  } catch (error) {
+    console.log("Error en la consulta a la BD: " + error);
+  }
+};
+
+const IsValidIdCardAdult = async (idCard) => {
+  try {
+    const query = "SELECT isexistidcardadult($1)";
+    const { rows } = await pool.query(query, [idCard]);
+    return rows[0].isexistidcardadult;
+  } catch (error) {
+    console.log("Error en la consulta a la BD: " + error);
+  }
+};
+
+const ChangePassword = async (email, newPassword) => {
+  try {
+    const query = "CALL changepasswordcredential($1, $2)";
+    const { rows } = await pool.query(query, [email, newPassword]);
+    return rows;
+  } catch (error) {
+    console.log("Error en la consulta a la BD: " + error);
+  }
+};
+
 // QUERY REGISTER DATA
-const registerAdministrator = async (
+const RegisterAdministrator = async (
   ad_idcard,
   ad_names,
   ad_lastnames,
@@ -51,7 +91,7 @@ const registerAdministrator = async (
   }
 };
 
-const registerOlderAdult = async (
+const RegisterOlderAdult = async (
   rp_idcard,
   oa_idcard,
   oa_names,
@@ -82,7 +122,7 @@ const registerOlderAdult = async (
   }
 };
 
-const registerRepresentative = async (
+const RegisterRepresentative = async (
   rp_idcard,
   rp_names,
   rp_lastnames,
@@ -107,7 +147,7 @@ const registerRepresentative = async (
 };
 
 // QUERY EDIT DATA
-const editRepresentative = async (
+const EditRepresentative = async (
   rp_idusuario,
   rp_idcard,
   rp_names,
@@ -127,13 +167,13 @@ const editRepresentative = async (
       rp_parentesco,
       rp_contacto,
     ]);
-    return rows[0];
+    return rows[0].functeditrepresentative;
   } catch (error) {
     console.log("Error en la consulta a la BD: " + error);
   }
 };
 
-const editOlderAdult = async (
+const EditOlderAdult = async (
   oa_idusuario,
   oa_idcard,
   oa_names,
@@ -153,18 +193,22 @@ const editOlderAdult = async (
       oa_birthdate,
       oa_enfermedad,
     ]);
-    return rows[0];
+    return rows[0].functeditolderadult;
   } catch (error) {
     console.log("Error en la consulta a la BD: " + error);
   }
 };
 
 export const nutrihealthModel = {
-  findAllRepOlderByEmail,
-  findLogin,
-  registerAdministrator,
-  registerOlderAdult,
-  registerRepresentative,
-  editRepresentative,
-  editOlderAdult,
+  ListOlderAdults,
+  FindAllRepOlderByEmail,
+  FindLogin,
+  IsValidEmail,
+  IsValidIdCardAdult,
+  ChangePassword,
+  RegisterAdministrator,
+  RegisterOlderAdult,
+  RegisterRepresentative,
+  EditRepresentative,
+  EditOlderAdult,
 };
