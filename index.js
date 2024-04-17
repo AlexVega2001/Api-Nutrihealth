@@ -1,9 +1,9 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import axios from "axios";
 import { OpenAI } from "openai";
 import nutrihealthRoute from "./routes/nutrihealth.route.js";
+import twilio from 'twilio';
 
 const app = express();
 const PORT = process.env.PORT ?? 5000;
@@ -13,70 +13,89 @@ app.use(express.json()); //Importante: Es un middleware que activa la propiedad 
 
 // Ruta para conectarse al asistente personalizado en GPT
 app.post("/api/v1/asistente-gpt", async (req, res) => {
+  const { text } = req.body;
   const ASSISTANT_ID = "asst_v835cpYFCcnQx14zdrhPMkON";
-  // Make sure your API key is set as an environment variable.
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   try {
-    // Create a thread with a message.
     const thread = await client.beta.threads.create({
       messages: [
         {
           role: "user",
-          // Update this with the query you want to use.
-          content: "Recomiendame 10 recetas para adultos mayores con diabetes.",
-          file_ids: [
-            "file-xOmsHONImehX654NOylySVYW",
-            "file-FQzUGSrWooZXFicKApJbvBa9",
-            "file-4bZ9MHHK2eJtr37d1LT2sove",
-            "file-BjWn1UQoXlC9pFhjh5Bd0WRj",
-          ],
+          content: `Necesito 10 recetas nutricionales para adultos mayores con ${text}. Los datos los necesito en español.`
         },
       ],
     });
 
-    // Submit the thread to the assistant (as a new run).
     const run = await client.beta.threads.runs.create(thread.id, {
       assistant_id: ASSISTANT_ID,
     });
 
-    // Print the ID of the created run.
-    console.log(`👉 Run Created: ${run.id}`);
+    console.log(`👉 Ejecución Creada: ${run.id}`);
 
-    // Wait for run to complete.
     let runStatus = run.status;
-    var data = [];
+    let recipes = [];
+
     while (runStatus !== "completed") {
-      const retrievedRun = await client.beta.threads.runs.retrieve(
-        thread.id,
-        run.id
-      );
+      const retrievedRun = await client.beta.threads.runs.retrieve(thread.id, run.id);
       console.log(`🏃 Run Status: ${retrievedRun.status}`);
       runStatus = retrievedRun.status;
-      if (runStatus === "requires_action") {
+      
+      if (runStatus === "completed") {
         const structured_response = JSON.parse(
-          retrievedRun.required_action.submit_tool_outputs.tool_calls[0]
-            .function.arguments
+          retrievedRun.required_action.submit_tool_outputs.tool_calls[0].function.arguments
         );
-        data.push(structured_response);
-        // break;
+        recipes.push(structured_response);
       }
-
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for 1 second before checking status again
+      else if (runStatus === "requires_action") {
+        // Obtener el ID de la llamada a la herramienta
+        // const toolCallId = retrievedRun.required_action.submit_tool_outputs.tool_calls[0].id;
+        // console.log(toolCallId);
+        // await client.beta.threads.runs.submitToolOutputs(thread.id, run.id, {
+        //   tool_outputs: [
+        //     {
+        //       tool_call_id: toolCallId,
+        //       output: JSON.stringify({ success: "true" }),
+        //     },
+        //   ],
+        // });
+        const structured_response = JSON.parse(
+          retrievedRun.required_action.submit_tool_outputs.tool_calls[0].function.arguments
+        );
+        recipes.push(structured_response);
+        break;
+      } else if (runStatus === "failed") {
+        return res.status(500).json({
+          "code": 500,
+          "message": retrievedRun.last_error
+        });
+      } else {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Esperar 1 segundo antes de verificar el estado nuevamente
+      }
     }
-    console.log(`🏁 Run Completed!`);
 
-    return res.send(data);
-    //Get the latest message from the thread.
-    // const message_response = client.beta.threads.messages.list(thread.id);
-    // const messages = (await message_response).data;
+    console.log(`🏁 Ejecución Completada!`);
+    return res.json(recipes);
 
-    // //Print the latest message.
-    // const latest_message = messages[0];
-    // console.log(`💬 Response: ${latest_message.content[0].text.value}`);
-    // return res.send(latest_message.content[0].text.value);
   } catch (error) {
     console.error("Error al obtener la respuesta:", error);
-    return res.send("Error al obtener la respuesta:", error);
+    return res.status(500).send("Error al obtener la respuesta.");
+  }
+});
+
+app.post("/api/v1/send-message", async (req, res) => {
+  const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  
+  try {
+    const message = await client.messages.create({
+      from: '+13344234686',
+      to: '+593991651232',
+      body: 'Hello World.',
+    });
+    console.log('Code Message: ' + message.sid);
+    return res.json({ status: "success", messageSid: message.sid });
+  } catch (error) {
+    console.log('Error al enviar el mensaje: ' + error);
+    return res.status(500).json({ status: "error", message: "Error al enviar el mensaje." });
   }
 });
 

@@ -34,21 +34,22 @@ const ValidateLoginController = async (req, res) => {
   }
 };
 
+// Validate User
+const ValidateUserController = async (req, res) => {
+  try {
+    const { vu_idcard } = req.body;
+    const data = await nutrihealthModel.IsValidUser(vu_idcard);
+    return res.json(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const ValidateIdCardAdultController = async (req, res) => {
   try {
     const { idCardAdult } = req.body;
     const data = await nutrihealthModel.IsValidIdCardAdult(idCardAdult);
-    if (!data) {
-      res.json({
-        status: "success",
-        message: "Cédula no existente!",
-      });
-    } else {
-      res.json({
-        status: "error",
-        message: "Cédula existente!",
-      });
-    }
+    return res.json(data);
   } catch (error) {
     console.log(error);
   }
@@ -215,6 +216,7 @@ export const nutrihealthController = {
   GetListOlderController,
   GetAllRepOlderController,
   ValidateLoginController,
+  ValidateUserController,
   ValidateIdCardAdultController,
   ChangePasswordController,
   RegisterAdminController,

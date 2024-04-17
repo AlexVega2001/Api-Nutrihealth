@@ -41,6 +41,16 @@ const IsValidIdCardAdult = async (idCard) => {
   }
 };
 
+const IsValidUser = async (idCard) => {
+  try {
+    const query = "SELECT validateuser($1)";
+    const { rows } = await pool.query(query, [idCard]);
+    return rows[0].validateuser;
+  } catch (error) {
+    console.log("Error en la consulta a la BD: " + error);
+  }
+};
+
 const ChangePassword = async (identificacion, newPassword) => {
   try {
     const query = "CALL changepasswordcredential($1, $2)";
@@ -189,6 +199,7 @@ export const nutrihealthModel = {
   FindAllRepOlderByIdentification,
   FindLogin,
   IsValidIdCardAdult,
+  IsValidUser,
   ChangePassword,
   RegisterAdministrator,
   RegisterOlderAdult,
