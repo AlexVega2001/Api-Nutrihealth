@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import { OpenAI } from "openai";
 import nutrihealthRoute from "./routes/nutrihealth.route.js";
-import twilio from 'twilio';
+import { Vonage } from "@vonage/server-sdk";
 
 const app = express();
 const PORT = process.env.PORT ?? 5000;
@@ -83,20 +83,44 @@ app.post("/api/v1/asistente-gpt", async (req, res) => {
 });
 
 app.post("/api/v1/send-message", async (req, res) => {
-  const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-  
+  const { password } = req.body;
+  const from = "Nutrihealth"
+  const to = "593991651232"
+  const text = `Tu contraseña: ${password} `
+
+  const vonage = new Vonage({
+    apiKey: 'f17824d2',
+    apiSecret: "k9zRWbbGkSUPTI4T"
+  })
+
   try {
-    const message = await client.messages.create({
-      from: '+13344234686',
-      to: '+593991651232',
-      body: 'Hello World.',
-    });
-    console.log('Code Message: ' + message.sid);
-    return res.json({ status: "success", messageSid: message.sid });
+    await vonage.sms.send({ to, from, text })
+      .then(resp => { 
+        console.log('Message sent successfully'); 
+        return res.json({ status: "success", messageText: resp.messages[0]["message-id"] });
+      })
+      .catch(err => { 
+        console.log('There was an error sending the messages.'); 
+        return res.json({ status: "error", messageText: err }); 
+      });
   } catch (error) {
-    console.log('Error al enviar el mensaje: ' + error);
-    return res.status(500).json({ status: "error", message: "Error al enviar el mensaje." });
+    console.log('Error: ' + error);
+    return res.json({ status: "error", messageText: error });
   }
+  // const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  
+  // try {
+  //   const message = await client.messages.create({
+  //     from: process.env.TWILIO_PHONE_NUMBER,
+  //     to: '+593991651232',
+  //     body: 'Hello World.',
+  //   });
+  //   console.log('Code Message: ' + message.accountSid);
+  //   return res.json({ status: "success", messageSid: message.accountSid });
+  // } catch (error) {
+  //   console.log('Error al enviar el mensaje: ' + error);
+  //   return res.status(500).json({ status: "error", message: "Error al enviar el mensaje." });
+  // }
 });
 
 app.use("/api/v1", nutrihealthRoute);
