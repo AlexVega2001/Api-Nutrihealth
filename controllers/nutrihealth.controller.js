@@ -107,7 +107,6 @@ const RegisterOlderAdultController = async (req, res) => {
       oa_lastnames,
       oa_gender,
       oa_birthdate,
-      oa_enfermedad,
       cr_correo,
       cr_password,
     } = req.body;
@@ -118,7 +117,6 @@ const RegisterOlderAdultController = async (req, res) => {
       oa_lastnames,
       oa_gender,
       oa_birthdate,
-      oa_enfermedad,
       cr_correo,
       cr_password
     );
@@ -192,8 +190,7 @@ const EditOlderAdultController = async (req, res) => {
       oa_names,
       oa_lastnames,
       oa_gender,
-      oa_birthdate,
-      oa_enfermedad,
+      oa_birthdate
     } = req.body;
 
     const response = await nutrihealthModel.EditOlderAdult(
@@ -202,8 +199,7 @@ const EditOlderAdultController = async (req, res) => {
       oa_names,
       oa_lastnames,
       oa_gender,
-      oa_birthdate,
-      oa_enfermedad
+      oa_birthdate
     );
     res.json(response);
   } catch (error) {

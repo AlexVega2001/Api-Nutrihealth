@@ -97,19 +97,17 @@ const RegisterOlderAdult = async (
   oa_names,
   oa_lastnames,
   oa_gender,
-  oa_birthdate,
-  oa_enfermedad
+  oa_birthdate
 ) => {
   try {
-    const query = "SELECT functaddolderadult($1, $2, $3, $4, $5, $6, $7)";
+    const query = "SELECT functaddolderadult($1, $2, $3, $4, $5, $6)";
     const { rows } = await pool.query(query, [
       rp_idcard,
       oa_idcard,
       oa_names,
       oa_lastnames,
       oa_gender,
-      oa_birthdate,
-      oa_enfermedad,
+      oa_birthdate
     ]);
     return rows[0].functaddolderadult;
   } catch (error) {
@@ -174,19 +172,17 @@ const EditOlderAdult = async (
   oa_names,
   oa_lastnames,
   oa_gender,
-  oa_birthdate,
-  oa_enfermedad
+  oa_birthdate
 ) => {
   try {
-    const query = "SELECT functeditolderadult($1, $2, $3, $4, $5, $6, $7)";
+    const query = "SELECT functeditolderadult($1, $2, $3, $4, $5, $6)";
     const { rows } = await pool.query(query, [
       oa_idusuario,
       oa_idcard,
       oa_names,
       oa_lastnames,
       oa_gender,
-      oa_birthdate,
-      oa_enfermedad,
+      oa_birthdate
     ]);
     return rows[0].functeditolderadult;
   } catch (error) {
