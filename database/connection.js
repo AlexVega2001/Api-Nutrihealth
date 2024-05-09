@@ -11,6 +11,9 @@ const portPG = process.env.PGPORT;
 // Configuración de la conexión usando variables de entorno
 const poolConfig = {
   connectionString: `postgresql://${usuarioPG}:${passwordPG}@${hostPG}:${portPG}/${databasePG}`,
+  ssl: {
+    rejectUnauthorized: false // Establece en true si tienes un certificado válido
+  },
   allowExitOnIdle: true
 };
 
